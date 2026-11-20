@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>JamalOS doorsturen</title>
+<style>
+body{margin:0;font:16px/1.5 system-ui,-apple-system,sans-serif;background:#f6f5f2;color:#1c1b19;display:grid;min-height:100vh;place-items:center}
+main{max-width:420px;padding:24px;text-align:center}
+h1{font-size:20px;margin:0 0 8px}
+p{margin:0 0 16px;color:#5c5a55}
+a.knop{display:block;padding:14px 18px;border-radius:14px;background:#1c1b19;color:#fff;text-decoration:none;font-weight:600;margin:0 0 10px}
+a.licht{background:#fff;color:#1c1b19;border:1px solid #d9d6cf}
+.groot{font-size:22px;font-weight:700;word-break:break-all;margin:0 0 16px;user-select:all}
+</style>
+</head>
+<body>
+<main id="m"><h1>JamalOS doorsturen</h1><p>Deze pagina belt een nummer of opent Outlook. Open hem vanuit JamalOS.</p></main>
+<script>
+/* JamalOS v3 · doorstuurpagina (Bouwbord rij 124, 19 nov 2026).
+   Een artifact mag zelf niet bellen of een mail-app openen. Deze pagina staat op een eigen webadres en doet dat wel.
+   Het nummer of adres staat achter het hekje (#bel=... of #mail=...) en gaat dus niet mee naar de server.
+   De pagina bewaart niets, laadt niets van buiten en stuurt alleen door naar tel:, ms-outlook: of mailto:. */
+(function(){
+  var m=document.getElementById('m'),h='';
+  try{h=decodeURIComponent(String(location.hash||'').slice(1));}catch(e){h='';}
+  var i=h.indexOf('='),soort=i>0?h.slice(0,i):'',wat=i>0?h.slice(i+1):'';
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  if(soort==='bel'&&/^\+?\d{8,15}$/.test(wat)){
+    m.innerHTML='<h1>Bellen</h1><div class="groot">'+esc(wat)+'</div><a class="knop" href="tel:'+esc(wat)+'">Bel dit nummer</a><p>Opent bellen niet vanzelf, tik dan op de knop.</p>';
+    location.href='tel:'+wat;return;}
+  if(soort==='mail'&&/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(wat)){
+    var o='ms-outlook://compose?to='+encodeURIComponent(wat),g='mailto:'+encodeURIComponent(wat).replace(/%40/g,'@');
+    m.innerHTML='<h1>Mailen</h1><div class="groot">'+esc(wat)+'</div><a class="knop" href="'+esc(o)+'">Open in Outlook</a><a class="knop licht" href="'+esc(g)+'">Open in de standaard mail-app</a><p>Opent Outlook niet vanzelf, tik dan op de knop.</p>';
+    location.href=o;return;}
+  if(h)m.innerHTML='<h1>Dit kan ik niet doorsturen</h1><p>Het nummer of adres is niet geldig. Ga terug naar JamalOS.</p>';
+})();
+</script>
+</body>
+</html>
